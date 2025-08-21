@@ -9,6 +9,7 @@ import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
 import Modal from "@/components/organisms/Modal";
+import FeeForm from "@/components/organisms/FeeForm";
 import { feeService } from "@/services/api/feeService";
 import { clientService } from "@/services/api/clientService";
 import { toast } from "react-toastify";
@@ -22,7 +23,7 @@ const Invoices = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
-
+  const [isNewInvoiceOpen, setIsNewInvoiceOpen] = useState(false);
   useEffect(() => {
     loadInvoices();
   }, []);
@@ -97,9 +98,19 @@ const Invoices = () => {
     console.log("Printing invoice:", invoice);
   };
 
-  const handleSendInvoice = (invoice) => {
+const handleSendInvoice = (invoice) => {
     // In a real app, this would send email
     toast.success(`Invoice ${invoice.invoiceNumber} sent to ${invoice.clientEmail}`);
+  };
+
+  const handleNewInvoice = () => {
+    setIsNewInvoiceOpen(true);
+  };
+
+  const handleInvoiceFormSuccess = () => {
+    setIsNewInvoiceOpen(false);
+    loadInvoices(); // Reload invoices to show the new one
+    toast.success("Invoice created successfully!");
   };
 
   const getBadgeVariant = (status) => {
@@ -165,8 +176,9 @@ const Invoices = () => {
             Export All
           </Button>
           <Button
-            variant="primary"
+variant="primary"
             icon="FileText"
+            onClick={handleNewInvoice}
           >
             New Invoice
           </Button>
@@ -443,6 +455,19 @@ const Invoices = () => {
             </div>
           </div>
         )}
+</Modal>
+
+      {/* New Invoice Modal */}
+      <Modal
+        isOpen={isNewInvoiceOpen}
+        onClose={() => setIsNewInvoiceOpen(false)}
+        title="Create New Invoice"
+        size="lg"
+      >
+        <FeeForm
+          onSuccess={handleInvoiceFormSuccess}
+          onCancel={() => setIsNewInvoiceOpen(false)}
+        />
       </Modal>
     </div>
   );
